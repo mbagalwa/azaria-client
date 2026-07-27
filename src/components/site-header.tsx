@@ -85,10 +85,10 @@ export function SiteHeader() {
           </a>
         </div>
 
-        {/* Droite - connexion */}
+        {/* Droite - accès direct au menu (aucun compte n'est nécessaire) */}
         <div className="flex justify-end">
           <a
-            href="/app"
+            href="#menu"
             className="inline-flex items-center gap-2 rounded-btn bg-ink px-4 py-2 text-[0.82rem] font-semibold text-cream transition-colors hover:bg-ink-soft sm:px-5"
           >
             <svg
@@ -102,10 +102,9 @@ export function SiteHeader() {
               strokeLinejoin="round"
               aria-hidden="true"
             >
-              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-              <circle cx="12" cy="7" r="4" />
+              <path d="M3 6h18M3 12h18M3 18h13" />
             </svg>
-            <span className="hidden sm:inline">Se connecter</span>
+            <span className="hidden sm:inline">Commander</span>
           </a>
         </div>
       </div>

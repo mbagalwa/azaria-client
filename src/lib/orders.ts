@@ -1,5 +1,20 @@
 import { apiFetch } from "@/lib/api";
 
+/**
+ * Accès à l'API PUBLIQUE : le client commande sans compte, aucune de ces
+ * requêtes ne porte de jeton.
+ */
+
+export type MenuAccompaniment = {
+  id: number;
+  name: string;
+  description: string | null;
+  /** Supplément par assiette. 0 = inclus dans le prix du plat. */
+  priceCents: number;
+  imageUrl: string | null;
+};
+
+/** LE plat du jour (un seul par date). */
 export type MenuDish = {
   dishId: number;
   name: string;
@@ -7,11 +22,14 @@ export type MenuDish = {
   imageUrl: string | null;
   category: string | null;
   priceCents: number;
+  accompaniments: MenuAccompaniment[];
 };
 
-export type Menu = {
-  date: string;
-  dishes: MenuDish[];
+export type MenuDay = { date: string; dish: MenuDish | null };
+
+export type WeekMenu = {
+  from: string;
+  days: MenuDay[];
   deliveryFeeCents: number;
   orderCutoff: string;
 };
@@ -22,7 +40,15 @@ export type OrderingWindow = {
   earliest: string;
   cutoff: string;
   afterCutoff: boolean;
+  deliveryFeeCents: number;
   tz: string;
+};
+
+export type OrderItemAccompaniment = {
+  id: number;
+  accompanimentId: number | null;
+  name: string;
+  priceCents: number;
 };
 
 export type OrderItemLite = {
@@ -31,9 +57,16 @@ export type OrderItemLite = {
   name: string;
   priceCents: number;
   quantity: number;
+  accompaniments: OrderItemAccompaniment[];
 };
 
 export type OrderEventLite = { id: number; status: string; createdAt: string };
+
+export type OrderCustomer = {
+  fullName: string;
+  phone: string | null;
+  initials: string;
+};
 
 export type Order = {
   id: number;
@@ -52,47 +85,53 @@ export type Order = {
   itemsCount: number;
   items: OrderItemLite[];
   events: OrderEventLite[];
+  customer: OrderCustomer;
   createdAt: string;
 };
 
+/**
+ * Payload de commande. Le plat n'y figure pas : il n'y en a qu'un par jour, le
+ * serveur le résout depuis la date (et facture le prix affiché).
+ */
 export type CreateOrderPayload = {
+  fullName: string;
+  phone: string;
   deliveryDate: string;
   deliveryTime: string;
   mode: "delivery" | "pickup";
   address: string | null;
   landmark: string | null;
-  paymentMethod: "cash_on_delivery" | "mobile_money";
   note: string | null;
-  items: { dishId: number; quantity: number }[];
+  quantity: number;
+  accompanimentIds: number[];
 };
 
-export function getMenu(date: string, token: string) {
-  return apiFetch<Menu>(`/api/v1/account/menu?date=${date}`, { token });
+/** Le plat du jour d'une date. */
+export function getMenu(date: string) {
+  return apiFetch<{
+    date: string;
+    dish: MenuDish | null;
+    deliveryFeeCents: number;
+    orderCutoff: string;
+  }>(`/api/v1/public/menu?date=${date}`);
+}
+
+/** Les plats de la semaine (7 jours à partir de la 1re date commandable). */
+export function getWeekMenu(from?: string) {
+  const qs = from ? `?from=${from}` : "";
+  return apiFetch<WeekMenu>(`/api/v1/public/menu/week${qs}`);
 }
 
 /** Fenêtre de commande (1re date commandable + cut-off), calculée côté serveur. */
-export function getOrderingWindow(token: string) {
-  return apiFetch<OrderingWindow>("/api/v1/account/ordering-window", { token });
+export function getOrderingWindow() {
+  return apiFetch<OrderingWindow>("/api/v1/public/ordering-window");
 }
 
-export function listMyOrders(token: string, opts: { page?: number; limit?: number } = {}) {
-  const params = new URLSearchParams();
-  if (opts.page) params.set("page", String(opts.page));
-  if (opts.limit) params.set("limit", String(opts.limit));
-  const qs = params.toString();
-  return apiFetch<Order[]>(`/api/v1/account/orders${qs ? `?${qs}` : ""}`, {
-    token,
-  });
+/** Suivi d'une commande par son code (le lien envoyé sur WhatsApp). */
+export function getOrderByCode(code: string) {
+  return apiFetch<Order>(`/api/v1/public/orders/${encodeURIComponent(code)}`);
 }
 
-export function getMyOrder(id: string | number, token: string) {
-  return apiFetch<Order>(`/api/v1/account/orders/${id}`, { token });
-}
-
-export function createOrder(body: CreateOrderPayload, token: string) {
-  return apiFetch<Order>("/api/v1/account/orders", {
-    method: "POST",
-    body,
-    token,
-  });
+export function createOrder(body: CreateOrderPayload) {
+  return apiFetch<Order>("/api/v1/public/orders", { method: "POST", body });
 }

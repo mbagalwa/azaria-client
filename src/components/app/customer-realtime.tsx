@@ -14,11 +14,13 @@ type CustomerOrderEvent = {
 };
 
 /**
- * Écoute le canal SSE `orders/user/:id`. À chaque changement de statut d'une
- * de ses commandes : un toast cliquable (→ suivi de la commande) + rafraîchit
- * la page (liste / détail) en direct.
+ * Écoute le canal SSE `orders/code/:code` sur la page de suivi. Le canal est
+ * indexé par le CODE de commande — le secret que le client détient via son lien
+ * — et non par un id séquentiel énumérable.
+ *
+ * À chaque changement : un toast + rafraîchissement de la page en direct.
  */
-export function CustomerRealtime({ userId }: { userId: number }) {
+export function CustomerRealtime({ code }: { code: string }) {
   const router = useRouter();
   const toast = useToast();
 
@@ -27,7 +29,7 @@ export function CustomerRealtime({ userId }: { userId: number }) {
     if (!baseUrl) return;
 
     const transmit = new Transmit({ baseUrl });
-    const subscription = transmit.subscription(`orders/user/${userId}`);
+    const subscription = transmit.subscription(`orders/code/${code}`);
     let timer: ReturnType<typeof setTimeout>;
     let stopped = false;
 
@@ -46,7 +48,7 @@ export function CustomerRealtime({ userId }: { userId: number }) {
                 ? "Paiement 🔔"
                 : "Mise à jour de commande 🔔",
               message: `${data.code ?? "Votre commande"} · ${label}`,
-              href: `/app/commandes/${data.id}`,
+              href: `/commande/${data.code ?? code}`,
             });
           }
           clearTimeout(timer);
@@ -63,7 +65,7 @@ export function CustomerRealtime({ userId }: { userId: number }) {
       subscription.delete().catch(() => {});
       transmit.close();
     };
-  }, [router, toast, userId]);
+  }, [router, toast, code]);
 
   return null;
 }

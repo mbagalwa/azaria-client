@@ -42,73 +42,17 @@ export const navLinks = [
   { label: "Contact", href: "#contact" },
 ] as const;
 
-/** Semaine actuellement programmée - viendra de l'API plus tard. */
-export const currentWeek = {
-  range: "Semaine du 20 au 24 juillet",
-} as const;
-
 /**
- * Programme de la semaine - DONNÉES FICTIVES en attendant l'API.
- *
- * Reflète le domaine : le menu est un calendrier (un plat par jour sur
- * un intervalle de dates), avec un statut de disponibilité basculé à la
- * main (« disponible » / « épuisé »). `today` met en avant le jour
- * courant. Les prix sont ceux de la formule, en USD.
+ * Textes de la section « plats de la semaine ». Le contenu (plats, prix,
+ * accompagnements, dates) vient de l'API publique : un seul plat par jour.
  */
 export const weekProgram = {
   eyebrow: "Le programme",
-  title: "Le menu de la semaine",
+  title: "Les plats de la semaine",
   intro:
-    "Un plat différent chaque jour, préparé le matin même. Réservez le vôtre pour le jour qui vous arrange.",
-  range: "Semaine du 20 au 24 juillet",
-  days: [
-    {
-      key: "lun",
-      day: "Lundi",
-      date: "20 juil.",
-      dish: "Haricots · Poulet fumé · Riz",
-      price: "8,50 $",
-      image: "/plats/menu/lundi.jpg",
-      status: "available" as const,
-    },
-    {
-      key: "mar",
-      day: "Mardi",
-      date: "21 juil.",
-      dish: "Ratatouille · Mabundu grillé · Riz ou Foufou",
-      price: "9,00 $",
-      image: "/plats/menu/mardi.jpg",
-      status: "sold_out" as const,
-    },
-    {
-      key: "mer",
-      day: "Mercredi",
-      date: "22 juil.",
-      dish: "Madesu · Chikwangue · Légumes",
-      price: "7,50 $",
-      image: "/plats/menu/mercredi.jpg",
-      status: "available" as const,
-      today: true,
-    },
-    {
-      key: "jeu",
-      day: "Jeudi",
-      date: "23 juil.",
-      dish: "Poulet mayo · Frites · Salade",
-      price: "8,00 $",
-      image: "/plats/menu/jeudi.jpg",
-      status: "available" as const,
-    },
-    {
-      key: "ven",
-      day: "Vendredi",
-      date: "24 juil.",
-      dish: "Poisson braisé · Banane plantain",
-      price: "10,00 $",
-      image: "/plats/menu/vendredi.jpg",
-      status: "available" as const,
-    },
-  ],
+    "Un seul plat par jour, préparé le matin même. Choisissez votre jour, ajoutez vos accompagnements, commandez sans créer de compte.",
+  /** Repli si l'API n'a encore rien programmé. */
+  range: "Menu de la semaine",
 } as const;
 
 /** Plat mis en avant dans la carte du hero. */
@@ -138,11 +82,11 @@ export const featuredDish = {
    * question, une promesse donne envie de cliquer.
    */
   teasers: [
-    "4 autres plats cette semaine",
+    "Un plat différent chaque jour",
     "Nouveau programme chaque lundi",
     "Riz, foufou ou plantain au choix",
   ],
-  cta: "Voir les 5 plats de la semaine",
+  cta: "Voir les plats de la semaine",
 } as const;
 
 /**
@@ -199,7 +143,7 @@ export const about = {
     {
       title: "Un menu qui change",
       description:
-        "Un nouveau programme chaque semaine. Cinq plats, jamais la lassitude.",
+        "Un nouveau programme chaque semaine. Un plat par jour, jamais la lassitude.",
       icon: "calendar" as const,
       tone: "ink" as const,
     },
@@ -218,27 +162,27 @@ export const howItWorks = {
   eyebrow: "En trois étapes",
   title: "Comment ça marche",
   intro:
-    "De la carte à votre table, tout tient en trois gestes. Pas de compte compliqué, pas d'attente au comptoir.",
+    "De la carte à votre table, tout tient en trois gestes. Aucun compte à créer, pas d'attente au comptoir.",
   steps: [
     {
       n: "01",
-      title: "Choisissez votre plat",
+      title: "Choisissez le jour",
       description:
-        "Parcourez le menu de la semaine et sélectionnez le plat du jour qui vous fait envie.",
+        "Un plat par jour, préparé le matin même. Sélectionnez la date qui vous arrange et ses accompagnements.",
       icon: "menu" as const,
     },
     {
       n: "02",
-      title: "Dites-nous quand et où",
+      title: "Laissez votre numéro",
       description:
-        "Livraison ou retrait, à la date et à l'heure qui vous arrangent. Ajoutez une note si besoin.",
+        "Nom, numéro WhatsApp, lieu de livraison : c'est tout. Vous recevez un accusé de réception dans la foulée.",
       icon: "clock" as const,
     },
     {
       n: "03",
-      title: "On cuisine, vous dégustez",
+      title: "Suivez sur WhatsApp",
       description:
-        "Votre plat est préparé le matin même, puis livré chez vous ou tenu prêt à emporter.",
+        "Confirmée, en préparation, en route : chaque étape vous arrive directement sur WhatsApp.",
       icon: "serve" as const,
     },
   ],

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { chef, currentWeek, featuredDish, site } from "@/lib/site";
+import { chef, featuredDish, site, weekProgram } from "@/lib/site";
 
 export function Hero() {
   const { plates } = featuredDish;
@@ -22,7 +22,7 @@ export function Hero() {
         <div className="lg:col-start-1 lg:row-start-1">
           <p className="inline-flex items-center gap-2 rounded-btn border border-ink/10 bg-surface px-4 py-1.5 text-xs font-medium tracking-wide text-ink-soft">
             <span className="size-1.5 rounded-full bg-brand" aria-hidden="true" />
-            {currentWeek.range}
+            {weekProgram.range}
           </p>
 
           <h1 className="mt-6 font-display text-[2.75rem] font-bold leading-[1.08] tracking-[-0.02em] text-ink sm:text-6xl lg:text-[4.25rem]">

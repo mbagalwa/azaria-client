@@ -14,8 +14,10 @@ export default function Home() {
 
       <main className="flex-1">
         <Hero />
-        <About />
+        {/* Les plats de la semaine passent juste après le hero : c'est ce que
+            le visiteur vient chercher, et c'est de là qu'il commande. */}
         <WeekProgram />
+        <About />
         <HowItWorks />
         <SpecialOrder />
         <Contact />
