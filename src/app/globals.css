@@ -1,26 +1,88 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* ------------------------------------------------------------------
+   Azaria - jetons de design
+   Palette dérivée du logo (orange #FF4D00) et du modèle 1 :
+   fond crème, encre vert profond, accent ambre.
+------------------------------------------------------------------- */
+@theme {
+  /* Surfaces */
+  --color-cream: #f7f1e7;
+  --color-cream-deep: #eee4d4;
+  --color-surface: #fffdf9;
+
+  /* Encre - vert profond, sert de « noir » à la marque */
+  --color-ink: #123b2e;
+  --color-ink-soft: #2f5a4a;
+  --color-ink-muted: #6f8a7d;
+
+  /* Marque - orange du logo */
+  --color-brand: #ff4d00;
+  --color-brand-dark: #d94100;
+  --color-brand-tint: #ffe9df;
+
+  /* Accent - ambre du modèle */
+  --color-amber: #ffc53d;
+  --color-amber-deep: #f2b01a;
+  --color-amber-tint: #fff3d4;
+
+  /* Typographie */
+  --font-display: var(--font-outfit), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-signature: var(--font-caveat), ui-serif, cursive;
+
+  /* Rayons */
+  --radius-btn: 0.75rem;
+  --radius-chip: 0.6rem;
+  --radius-card: 1.5rem;
+  --radius-panel: 2rem;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection {
+    background-color: var(--color-amber);
+    color: var(--color-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+
+  /* Surlignage « marqueur » du titre principal, comme sur le modèle 1 */
+  .marker-highlight {
+    position: relative;
+    display: inline-block;
+    isolation: isolate;
+    /* Compense le débord du surlignage pour que l'espace qui suit
+       reste visible entre le mot surligné et le suivant. */
+    margin-inline-end: 0.16em;
+  }
+
+  .marker-highlight::before {
+    content: "";
+    position: absolute;
+    /* Cadré sur la hauteur des lettres, sans déborder sur le mot suivant */
+    inset: 0.2em -0.12em 0.22em -0.12em;
+    z-index: -1;
+    background-color: var(--color-amber);
+    transform: rotate(-1.6deg);
+    border-radius: 0.1em;
+  }
+
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }

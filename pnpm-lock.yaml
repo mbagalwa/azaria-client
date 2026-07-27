@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@adonisjs/transmit-client':
+        specifier: ^1.1.0
+        version: 1.1.0
       next:
         specifier: 16.2.11
         version: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -44,6 +47,10 @@ importers:
         version: 5.9.3
 
 packages:
+
+  '@adonisjs/transmit-client@1.1.0':
+    resolution: {integrity: sha512-4U3DJ4V2X7S0Js04aX7P3SJOq+3RWmCLZep5aRsB1Eo3S9xgRAlWu5gLFrIM/XVRG3DKjvOckeeGNwPPxXhGEQ==}
+    engines: {node: '>=18.16.0'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -1987,6 +1994,8 @@ packages:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
+
+  '@adonisjs/transmit-client@1.1.0': {}
 
   '@alloc/quick-lru@5.2.0': {}
 
