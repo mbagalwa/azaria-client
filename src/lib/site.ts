@@ -34,12 +34,18 @@ export const site = {
   ],
 } as const;
 
-/** Liens de la barre de navigation (colonne de gauche). */
+/**
+ * Liens de la barre de navigation (colonne de gauche).
+ *
+ * Les ancres sont préfixées par `/` : le header sert AUSSI la page de suivi
+ * `/commande/[code]`, où ces sections n'existent pas. Une ancre nue (`#menu`)
+ * n'y ferait rien ; `/#menu` ramène à l'accueil puis défile jusqu'à la section.
+ */
 export const navLinks = [
-  { label: "Menu", href: "#menu" },
-  { label: "Comment ça marche", href: "#fonctionnement" },
-  { label: "Commande spéciale", href: "#commande-speciale" },
-  { label: "Contact", href: "#contact" },
+  { label: "Menu", href: "/#menu" },
+  { label: "Fonctionnement", href: "/#fonctionnement" },
+  { label: "Sur mesure", href: "/#commande-speciale" },
+  { label: "Contact", href: "/#contact" },
 ] as const;
 
 /**

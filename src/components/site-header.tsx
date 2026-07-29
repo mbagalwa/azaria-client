@@ -1,16 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { Logo } from "@/components/logo";
 import { navLinks } from "@/lib/site";
 
 /**
- * Barre de navigation : menu à gauche, logo au centre, bouton de
- * connexion à droite (disposition demandée).
+ * Barre de navigation : menu à gauche, logo au centre, bouton « Commander »
+ * à droite (disposition demandée).
  *
  * En dessous de `lg`, les liens basculent dans un panneau dépliant
  * ouvert par le bouton hamburger, qui reste à gauche pour préserver
  * l'équilibre de la composition.
+ *
+ * Ce header sert la vitrine ET la page de suivi de commande : toutes les
+ * destinations sont donc absolues (`/#section`), jamais de simples ancres.
  */
 export function SiteHeader() {
   const [open, setOpen] = useState(false);
@@ -32,17 +36,17 @@ export function SiteHeader() {
       }`}
     >
       <div className="mx-auto grid h-14 max-w-7xl grid-cols-[auto_1fr_auto] items-center gap-4 px-5 sm:px-8 lg:h-16 lg:grid-cols-3">
-        {/* Gauche - navigation */}
+        {/* Gauche - navigation, compacte pour ne pas serrer le logo central */}
         <nav className="hidden lg:block">
-          <ul className="flex items-center gap-6 xl:gap-7">
+          <ul className="flex items-center gap-4 xl:gap-5">
             {navLinks.map((link) => (
               <li key={link.href}>
-                <a
+                <Link
                   href={link.href}
-                  className="whitespace-nowrap text-sm font-medium text-ink-soft transition-colors hover:text-brand"
+                  className="whitespace-nowrap text-[0.8rem] font-medium text-ink-soft transition-colors hover:text-brand"
                 >
                   {link.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
@@ -75,20 +79,21 @@ export function SiteHeader() {
           </span>
         </button>
 
-        {/* Centre - logo */}
+        {/* Centre - logo, retour à l'accueil */}
         <div className="flex justify-center">
-          <a
-            href="#"
+          <Link
+            href="/"
+            aria-label="Azaria — retour à l'accueil"
             className="rounded-full text-brand outline-offset-4 transition-opacity hover:opacity-80"
           >
             <Logo size={28} />
-          </a>
+          </Link>
         </div>
 
         {/* Droite - accès direct au menu (aucun compte n'est nécessaire) */}
         <div className="flex justify-end">
-          <a
-            href="#menu"
+          <Link
+            href="/#menu"
             className="inline-flex items-center gap-2 rounded-btn bg-ink px-4 py-2 text-[0.82rem] font-semibold text-cream transition-colors hover:bg-ink-soft sm:px-5"
           >
             <svg
@@ -105,7 +110,7 @@ export function SiteHeader() {
               <path d="M3 6h18M3 12h18M3 18h13" />
             </svg>
             <span className="hidden sm:inline">Commander</span>
-          </a>
+          </Link>
         </div>
       </div>
 
@@ -118,13 +123,13 @@ export function SiteHeader() {
         <ul className="mx-auto max-w-7xl px-5 py-4 sm:px-8">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <a
+              <Link
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className="block border-b border-ink/5 py-3 text-base font-medium text-ink-soft transition-colors last:border-0 hover:text-brand"
               >
                 {link.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

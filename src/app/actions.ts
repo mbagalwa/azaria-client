@@ -21,14 +21,21 @@ export async function createOrderAction(
   const text = (k: string) => String(formData.get(k) ?? "").trim();
 
   const fullName = text("fullName");
-  const phone = text("phone");
   const mode = text("mode") === "pickup" ? "pickup" : "delivery";
   const address = text("address");
+
+  // Le numéro arrive en deux parties : indicatif (+243…) + numéro national.
+  // On retire le 0 de tête pour recomposer un E.164 propre (+243991234567).
+  const countryCode = text("countryCode") || "+243";
+  const national = text("phoneNumber")
+    .replace(/\D/g, "")
+    .replace(/^0+/, "");
+  const phone = `${countryCode}${national}`;
 
   if (fullName.length < 2) {
     return { error: "Indiquez votre nom complet." };
   }
-  if (phone.replace(/\D/g, "").length < 9) {
+  if (national.length < 6) {
     return { error: "Indiquez un numéro WhatsApp valide (ex. 099 123 45 67)." };
   }
   if (mode === "delivery" && !address) {
