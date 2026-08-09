@@ -1,15 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import { OrderDialog } from "@/components/order-dialog";
 import { formatLongFR } from "@/lib/dates";
 import { formatUsd } from "@/lib/format";
 import type { MenuDish } from "@/lib/orders";
 import { dishOfDay, site } from "@/lib/site";
-
-/** Photo d'ambiance quand l'admin n'a pas encore illustré le plat. */
-const FALLBACK_DISH_PHOTO = "/plats/plat-riz.jpg";
 
 const listFR = new Intl.ListFormat("fr", { style: "long", type: "conjunction" });
 
@@ -200,10 +196,7 @@ export function DishOfDay({
 
           {/* L'assiette du jour, avec sa catégorie en incrustation */}
           <div className="relative mt-4 aspect-16/10 overflow-hidden rounded-card bg-ink/5 shadow-[0_24px_50px_-24px_rgba(18,59,46,0.65)] ring-1 ring-ink/10">
-            <DishPhoto
-              src={dish.imageUrl || FALLBACK_DISH_PHOTO}
-              alt={dish.imageUrl ? dish.name : ""}
-            />
+            <DishPhoto src={dish.imageUrl} alt={dish.name} />
             {dish.category && (
               <span className="absolute left-3 top-3 rounded-chip bg-ink/85 px-2.5 py-1 text-[0.68rem] font-bold uppercase tracking-wide text-cream backdrop-blur-sm">
                 {dish.category}
@@ -228,6 +221,12 @@ export function DishOfDay({
                       <img
                         src={side.imageUrl}
                         alt=""
+                        width={40}
+                        height={40}
+                        /* Vignettes secondaires : elles peuvent attendre,
+                           la photo du plat passe en premier. */
+                        loading="lazy"
+                        decoding="async"
                         className="size-10 shrink-0 rounded-chip object-cover"
                       />
                     ) : (
@@ -344,23 +343,46 @@ function PriceTile({
 }
 
 /**
- * Photo du plat. Les images de l'API sont distantes et donc servies par
- * `<img>` (pas de domaine configuré pour next/image) ; le repli du
- * dossier public passe par next/image.
+ * Photo du plat — UNIQUEMENT celle enregistrée depuis l'admin (Cloudinary).
+ * Aucune image de substitution : montrer une assiette du dossier `public`
+ * ferait passer une photo d'ambiance pour le plat réellement servi. Sans
+ * photo, on affiche le même cadre neutre que les cartes de la semaine.
+ *
+ * Les URL étant distantes, elles passent par `<img>` : aucun domaine
+ * n'est déclaré pour next/image.
  */
-function DishPhoto({ src, alt }: { src: string; alt: string }) {
-  if (!src.startsWith("/")) {
-    // eslint-disable-next-line @next/next/no-img-element
-    return <img src={src} alt={alt} className="h-full w-full object-cover" />;
+function DishPhoto({ src, alt }: { src: string | null; alt: string }) {
+  if (!src) {
+    return (
+      <div className="flex h-full items-center justify-center bg-cream text-ink-muted/60">
+        <svg
+          width="46"
+          height="46"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2M17 2c-1.5 2-2 4-2 6s.5 3 2 3 2-1 2-3-.5-4-2-6zM17 11v11" />
+        </svg>
+      </div>
+    );
   }
   return (
-    <Image
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
       src={src}
       alt={alt}
-      fill
-      priority
-      sizes="(max-width: 1024px) 92vw, 46vw"
-      className="object-cover"
+      /* Surtout PAS de lazy ici : c'est la plus grande image de la page,
+         visible d'emblée, donc l'élément qui décide du LCP. La différer
+         retarderait l'affichage au lieu de l'accélérer. */
+      loading="eager"
+      fetchPriority="high"
+      decoding="async"
+      className="h-full w-full object-cover"
     />
   );
 }

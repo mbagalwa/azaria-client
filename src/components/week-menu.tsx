@@ -86,6 +86,11 @@ function DayCard({
           <img
             src={dish.imageUrl}
             alt={dish.name}
+            /* Section sous la ligne de flottaison : les 7 photos ne se
+               téléchargent qu'à l'approche du viewport. Le cadre ayant un
+               ratio fixe, rien ne se décale à leur arrivée. */
+            loading="lazy"
+            decoding="async"
             className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
               orderable ? "" : "grayscale"
             }`}
