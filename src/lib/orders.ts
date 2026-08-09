@@ -21,7 +21,15 @@ export type MenuDish = {
   description: string | null;
   imageUrl: string | null;
   category: string | null;
+  /** Prix figé du programme : celui qui sera facturé. */
   priceCents: number;
+  /**
+   * Prix de référence du catalogue. S'il dépasse le prix figé, la date est
+   * programmée en promotion et la vitrine barre ce montant.
+   */
+  catalogPriceCents: number;
+  /** Commandes non annulées ayant déjà contenu ce plat. */
+  orderCount: number;
   accompaniments: MenuAccompaniment[];
 };
 

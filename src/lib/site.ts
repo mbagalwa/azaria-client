@@ -8,16 +8,20 @@
 export const site = {
   name: "Azaria",
   tagline: "Le menu du jour, réservé à l'avance.",
+  /** Slogan de la marque, repris de l'affiche (design/affiche_model.png). */
+  slogan: "Cuisiné avec passion, servi avec fierté",
   description:
     "Azaria programme chaque semaine un menu différent. Choisissez votre plat, votre date et votre heure de livraison - on s'occupe du reste.",
 
   contact: {
-    address: "42, avenue du Lac · Quartier Himbi",
-    city: "Goma, RD Congo",
-    phone: "+243 990 000 000",
-    whatsapp: "+243 990 000 000",
+    /** ⚠️ Adresse fictive - la commune (Gombe) vient de l'affiche. */
+    address: "Commune de la Gombe",
+    city: "Kinshasa, RD Congo",
+    /** Numéro réel, relevé sur l'affiche officielle. */
+    phone: "+243 826 264 770",
+    whatsapp: "+243 826 264 770",
     /** Chiffres uniquement, format international - pour les liens wa.me. */
-    whatsappDigits: "243990000000",
+    whatsappDigits: "243826264770",
     email: "bonjour@azaria.cd",
   },
 
@@ -35,20 +39,6 @@ export const site = {
 } as const;
 
 /**
- * Liens de la barre de navigation (colonne de gauche).
- *
- * Les ancres sont préfixées par `/` : le header sert AUSSI la page de suivi
- * `/commande/[code]`, où ces sections n'existent pas. Une ancre nue (`#menu`)
- * n'y ferait rien ; `/#menu` ramène à l'accueil puis défile jusqu'à la section.
- */
-export const navLinks = [
-  { label: "Menu", href: "/#menu" },
-  { label: "Fonctionnement", href: "/#fonctionnement" },
-  { label: "Sur mesure", href: "/#commande-speciale" },
-  { label: "Contact", href: "/#contact" },
-] as const;
-
-/**
  * Textes de la section « plats de la semaine ». Le contenu (plats, prix,
  * accompagnements, dates) vient de l'API publique : un seul plat par jour.
  */
@@ -61,179 +51,23 @@ export const weekProgram = {
   range: "Menu de la semaine",
 } as const;
 
-/** Plat mis en avant dans la carte du hero. */
-export const featuredDish = {
-  eyebrow: "Le choix du jour",
-  title: "Haricots, poulet fumé & riz",
-  price: "8,50 $",
-  /**
-   * Trois assiettes, comme sur le modèle : une principale au centre et
-   * deux secondaires en retrait. Images d'illustration Unsplash -
-   * voir public/plats/CREDITS.md.
-   */
-  plates: {
-    main: {
-      src: "/plats/plat-riz.jpg",
-      alt: "Assiette de riz épicé aux légumes",
-    },
-    left: { src: "/plats/plat-poulet.jpg", alt: "Plat de poulet grillé" },
-    right: {
-      src: "/plats/plat-legumes.jpg",
-      alt: "Bol de légumes et céréales",
-    },
-  },
-  /**
-   * Accroches destinées à ouvrir l'appétit et à pousser vers le menu
-   * complet - volontairement pas des prix : un tarif referme la
-   * question, une promesse donne envie de cliquer.
-   */
-  teasers: [
-    "Un plat différent chaque jour",
-    "Nouveau programme chaque lundi",
-    "Riz, foufou ou plantain au choix",
-  ],
-  cta: "Voir les plats de la semaine",
-} as const;
-
 /**
- * Mot de la cheffe affiché dans le hero.
- *
- * ⚠️ PLACEHOLDER : le nom, la citation et la photo sont inventés.
- * À remplacer par la vraie cheffe d'Azaria, avec son accord, avant
- * toute mise en ligne - présenter ceci comme authentique tromperait
- * les clients.
+ * Section « Plat du jour », calquée sur l'affiche officielle
+ * (design/affiche_model.png). Le plat lui-même vient de l'API ; ne
+ * restent ici que les textes fixes.
  */
-export const chef = {
-  name: "Cheffe Nadine Mwamba",
-  role: "Cheffe de cuisine",
-  quote:
-    "Je cuisine chaque plat le jour même, avec ce que le marché offre de meilleur. Rien n'attend au congélateur.",
-  photo: "/plats/cheffe.jpg",
-  /** Reproduit la signature manuscrite du modèle. */
-  signature: "Nadine M.",
+export const dishOfDay = {
+  title: "Le plat du jour",
+  /** Avantage affiché sur l'affiche - à ajuster si l'offre change. */
+  perk: "Bouteille d'eau 250 ml offerte",
+  cta: "Commander ce plat",
+  /** Bandeau de réassurance repris du pied de l'affiche officielle. */
+  guarantees: [
+    "Livraison rapide",
+    "Plat frais du jour",
+    "Qualité garantie",
+  ],
+  /** Phrase d'ambiance du bas de l'affiche, sous la composition du plat. */
+  pitch: "Un repas savoureux et généreux aux saveurs locales.",
 } as const;
 
-/**
- * Section « À propos » - mosaïque d'images à gauche, titre + points à
- * droite (d'après design/model-about-us.png). Images d'illustration
- * Unsplash, voir public/plats/CREDITS.md.
- */
-export const about = {
-  eyebrow: "La maison",
-  title: "Une cuisine fraîche, pensée pour vous.",
-  intro:
-    "Azaria n'est pas un fast-food comme les autres. Chaque semaine, un menu différent ; chaque jour, des plats préparés le matin même.",
-  mosaic: {
-    main: {
-      src: "/plats/about/about-main.jpg",
-      alt: "Plat mijoté servi avec des légumes frais",
-    },
-    top: {
-      src: "/plats/about/about-top.jpg",
-      alt: "Assiette dressée avec soin",
-    },
-    bottom: {
-      src: "/plats/about/about-bottom.jpg",
-      alt: "Plat de nouilles sautées",
-    },
-  },
-  badge: "Fait maison",
-  features: [
-    {
-      title: "Cuisiné le jour même",
-      description:
-        "Rien ne dort au congélateur. On prépare le matin, avec les produits du marché.",
-      icon: "flame" as const,
-      tone: "brand" as const,
-    },
-    {
-      title: "Un menu qui change",
-      description:
-        "Un nouveau programme chaque semaine. Un plat par jour, jamais la lassitude.",
-      icon: "calendar" as const,
-      tone: "ink" as const,
-    },
-    {
-      title: "Livré ou à emporter",
-      description:
-        "Vous choisissez le jour et l'heure. On s'occupe du reste, chez vous ou à retirer.",
-      icon: "bag" as const,
-      tone: "amber" as const,
-    },
-  ],
-} as const;
-
-/** Section « Comment ça marche » - le parcours en trois étapes. */
-export const howItWorks = {
-  eyebrow: "En trois étapes",
-  title: "Comment ça marche",
-  intro:
-    "De la carte à votre table, tout tient en trois gestes. Aucun compte à créer, pas d'attente au comptoir.",
-  steps: [
-    {
-      n: "01",
-      title: "Choisissez le jour",
-      description:
-        "Un plat par jour, préparé le matin même. Sélectionnez la date qui vous arrange et ses accompagnements.",
-      icon: "menu" as const,
-    },
-    {
-      n: "02",
-      title: "Laissez votre numéro",
-      description:
-        "Nom, numéro WhatsApp, lieu de livraison : c'est tout. Vous recevez un accusé de réception dans la foulée.",
-      icon: "clock" as const,
-    },
-    {
-      n: "03",
-      title: "Suivez sur WhatsApp",
-      description:
-        "Confirmée, en préparation, en route : chaque étape vous arrive directement sur WhatsApp.",
-      icon: "serve" as const,
-    },
-  ],
-} as const;
-
-/**
- * Section « Commande spéciale ».
- *
- * Reflète le flux du domaine : plat hors menu décrit librement → devis
- * fixé par l'admin → validation du client, puis préparation.
- */
-export const specialOrder = {
-  eyebrow: "Sur mesure",
-  title: "Une envie hors menu ?",
-  description:
-    "Un plat qui n'est pas au programme, un repas pour un événement, une grande tablée ? Décrivez ce que vous voulez : on vous répond avec un prix, vous validez, on cuisine.",
-  steps: [
-    {
-      title: "Décrivez votre demande",
-      description: "Le plat, la quantité, la date. En quelques lignes.",
-    },
-    {
-      title: "On vous envoie un devis",
-      description: "Un prix clair, sans engagement, sous 24 h.",
-    },
-    {
-      title: "Vous validez, on prépare",
-      description: "Dès votre accord, votre commande entre en cuisine.",
-    },
-  ],
-  cta: "Faire une demande",
-  note: "Prévoyez au moins 48 h pour les commandes spéciales.",
-} as const;
-
-/** Section « Contact ». */
-export const contactSection = {
-  eyebrow: "Nous écrire",
-  title: "Une question ? Parlons-en.",
-  intro:
-    "Une demande, une commande spéciale, une remarque ? Le plus simple reste WhatsApp - on répond vite.",
-  /** Sujets proposés dans le formulaire (pré-remplissent le message). */
-  topics: [
-    "Passer une commande",
-    "Commande spéciale",
-    "Question sur le menu",
-    "Autre",
-  ],
-} as const;

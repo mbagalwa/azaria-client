@@ -6,6 +6,8 @@ type LogoProps = {
   /** Masquer le mot « Azaria » et ne garder que le symbole. */
   markOnly?: boolean;
   className?: string;
+  /** Couleur du mot « Azaria » - à surcharger sur fond sombre. */
+  wordClassName?: string;
 };
 
 /**
@@ -13,7 +15,12 @@ type LogoProps = {
  * /logo.svg) pour éviter une requête supplémentaire et garder un rendu
  * net à toutes les tailles.
  */
-export function Logo({ size = 34, markOnly = false, className }: LogoProps) {
+export function Logo({
+  size = 34,
+  markOnly = false,
+  className,
+  wordClassName = "text-ink",
+}: LogoProps) {
   return (
     <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
       <svg
@@ -40,7 +47,9 @@ export function Logo({ size = 34, markOnly = false, className }: LogoProps) {
       </svg>
 
       {!markOnly && (
-        <span className="font-display text-[1.2rem] font-semibold tracking-tight text-ink">
+        <span
+          className={`font-display text-[1.2rem] font-semibold tracking-tight ${wordClassName}`}
+        >
           {site.name}
         </span>
       )}

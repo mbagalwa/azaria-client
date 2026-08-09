@@ -1,21 +1,27 @@
 import { WeekMenu } from "@/components/week-menu";
-import { getOrderingWindow, getWeekMenu } from "@/lib/orders";
+import type {
+  OrderingWindow,
+  WeekMenu as WeekMenuData,
+} from "@/lib/orders";
 import { formatShortFR } from "@/lib/dates";
 import { weekProgram } from "@/lib/site";
 
 /**
  * Section « plats de la semaine », alimentée par l'API publique : un plat par
  * jour, commandable sans compte. Les dates commandables et le cut-off viennent
- * du serveur (fuseau métier) — la vitrine ne recalcule rien.
+ * du serveur (fuseau métier) — la vitrine ne recalcule rien. Les données sont
+ * chargées par la page (partagées avec la section « plat du jour »).
  */
-export async function WeekProgram() {
-  const [menuRes, windowRes] = await Promise.all([
-    getWeekMenu(),
-    getOrderingWindow(),
-  ]);
-
-  const menu = menuRes.ok ? menuRes.data : null;
-  const win = windowRes.ok ? windowRes.data : null;
+export function WeekProgram({
+  menu,
+  menuOk,
+  win,
+}: {
+  menu: WeekMenuData | null;
+  /** Faux si l'appel API a échoué (affiche le message d'indisponibilité). */
+  menuOk: boolean;
+  win: OrderingWindow | null;
+}) {
   const days = menu?.days ?? [];
   const range =
     days.length > 0
@@ -60,7 +66,7 @@ export async function WeekProgram() {
 
       {days.length === 0 ? (
         <p className="mt-10 rounded-card border border-dashed border-ink/15 px-6 py-14 text-center text-sm text-ink-muted">
-          {menuRes.ok
+          {menuOk
             ? "Le menu de la semaine arrive très bientôt."
             : "Le menu est momentanément indisponible. Réessayez dans un instant."}
         </p>

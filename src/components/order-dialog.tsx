@@ -88,7 +88,7 @@ export function OrderDialog({
     return (
       <Shell onClose={onClose} title="Commande envoyée">
         <div className="space-y-4 text-center">
-          <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-[#e6f4ec]">
+          <div className="mx-auto flex size-14 items-center justify-center rounded-card bg-[#e6f4ec]">
             <svg
               width="26" height="26" viewBox="0 0 24 24" fill="none"
               stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"
@@ -424,7 +424,7 @@ function StepBadge({
   return (
     <span className="flex items-center gap-2">
       <span
-        className={`flex size-6 items-center justify-center rounded-full text-xs font-bold ${
+        className={`flex size-6 items-center justify-center rounded-chip text-xs font-bold ${
           active
             ? "bg-brand text-white"
             : done
@@ -493,7 +493,7 @@ function Stepper({
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className="flex size-8 items-center justify-center rounded-full border border-ink/15 bg-surface text-lg font-bold text-ink transition-colors hover:border-ink/40 disabled:opacity-40"
+      className="flex size-8 items-center justify-center rounded-btn border border-ink/15 bg-surface text-lg font-bold text-ink transition-colors hover:border-ink/40 disabled:opacity-40"
     >
       {symbol}
     </button>
@@ -531,7 +531,7 @@ function Shell({
             type="button"
             onClick={onClose}
             aria-label="Fermer"
-            className="-mr-1 -mt-1 shrink-0 rounded-full p-1.5 text-ink-muted transition-colors hover:bg-cream hover:text-ink"
+            className="-mr-1 -mt-1 shrink-0 rounded-btn p-1.5 text-ink-muted transition-colors hover:bg-cream hover:text-ink"
           >
             <svg
               width="18" height="18" viewBox="0 0 24 24" fill="none"

@@ -7,8 +7,14 @@ import { formatUsd } from "@/lib/format";
 import type { MenuDay } from "@/lib/orders";
 
 /**
- * Les plats de la semaine : UN plat par jour. Un clic sur « Commander » ouvre
- * le formulaire — aucun compte n'est demandé.
+ * Les plats de la semaine, en grille de cartes d'après design/list.png :
+ * photo carrée, repère de popularité, prix (barré quand la date est
+ * programmée en promotion) et bouton compact. Un clic sur « Commander »
+ * ouvre le formulaire — aucun compte n'est demandé.
+ *
+ * Deux écarts assumés avec le modèle : chaque carte est un JOUR et non un
+ * produit (d'où la date en surtitre), et le badge de notation devient un
+ * compteur de commandes réelles — il n'existe aucun système d'avis.
  */
 export function WeekMenu({
   days,
@@ -28,7 +34,7 @@ export function WeekMenu({
 
   return (
     <>
-      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {days.map((day) => (
           <DayCard
             key={day.date}
@@ -65,14 +71,16 @@ function DayCard({
   onOrder: () => void;
 }) {
   const dish = day.dish;
+  /** Promotion réelle : le prix du programme passe sous le prix catalogue. */
+  const onSale = dish ? dish.catalogPriceCents > dish.priceCents : false;
 
   return (
     <article
-      className={`group relative flex flex-col overflow-hidden rounded-card border bg-surface transition-shadow hover:shadow-[0_20px_45px_-25px_rgba(18,59,46,0.5)] ${
-        isToday ? "border-amber-deep ring-1 ring-amber-deep" : "border-ink/10"
+      className={`group relative flex flex-col rounded-card border bg-surface p-3 transition-shadow hover:shadow-[0_20px_45px_-25px_rgba(18,59,46,0.5)] ${
+        isToday ? "border-ink ring-1 ring-ink" : "border-ink/10"
       }`}
     >
-      <div className="relative aspect-4/3 overflow-hidden bg-cream-deep">
+      <div className="relative aspect-square overflow-hidden rounded-chip bg-cream">
         {dish?.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -83,7 +91,7 @@ function DayCard({
             }`}
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-ink-muted">
+          <div className="flex h-full items-center justify-center text-ink-muted/60">
             <svg
               width="34"
               height="34"
@@ -100,21 +108,31 @@ function DayCard({
           </div>
         )}
 
-        {/* Pastille jour + date */}
-        <span
-          className={`absolute left-3 top-3 rounded-chip px-2.5 py-1 text-[0.7rem] font-bold capitalize shadow-sm ${
-            isToday ? "bg-amber text-ink" : "bg-surface/95 text-ink"
-          }`}
-        >
-          {weekdayShortFR(day.date)}
-          <span className="ml-1.5 font-medium text-ink-muted">
-            {formatShortFR(day.date)}
+        {/* Popularité réelle — remplace la notation du modèle */}
+        {dish && dish.orderCount > 0 && (
+          <span
+            className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-chip bg-surface/95 px-2 py-1 text-[0.68rem] font-bold text-ink shadow-sm"
+            title={`Déjà commandé ${dish.orderCount} fois`}
+          >
+            <svg
+              width="11"
+              height="11"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              aria-hidden="true"
+              className="text-brand"
+            >
+              <path d="M12 2.7s6 6.5 6 11.3a6 6 0 0 1-12 0C6 9.2 12 2.7 12 2.7z" />
+            </svg>
+            {dish.orderCount}
+            <span className="sr-only"> commandes déjà passées</span>
           </span>
-        </span>
+        )}
 
-        {isToday && dish && (
-          <span className="absolute right-3 top-3 rounded-chip bg-ink px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wide text-cream shadow-sm">
-            Aujourd&apos;hui
+        {/* Promotion : seulement si le prix programmé est réellement plus bas */}
+        {onSale && (
+          <span className="absolute left-2 top-2 rounded-chip bg-brand px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wide text-white shadow-sm">
+            Promo
           </span>
         )}
 
@@ -127,22 +145,19 @@ function DayCard({
         )}
       </div>
 
-      <div className="flex flex-1 flex-col p-4">
-        <h3 className="font-display text-[0.95rem] font-bold leading-snug text-ink">
-          {dish?.name ?? "—"}
+      <div className="flex flex-1 flex-col px-0.5 pt-3">
+        <p className="text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ink-muted">
+          <span className={isToday ? "text-brand" : undefined}>
+            {isToday ? "Aujourd'hui" : weekdayShortFR(day.date)}
+          </span>
+          <span className="ml-1.5 font-semibold">{formatShortFR(day.date)}</span>
+        </p>
+
+        <h3 className="mt-1 line-clamp-2 text-[0.9rem] font-semibold leading-snug text-ink">
+          {dish?.name ?? "Pas de service"}
         </h3>
 
-        {dish && dish.accompaniments.length > 0 && (
-          <p className="mt-1.5 line-clamp-2 text-xs leading-relaxed text-ink-muted">
-            Servi avec {dish.accompaniments.map((a) => a.name).join(", ")}
-          </p>
-        )}
-
-        <div className="mt-auto flex items-center justify-between gap-2 pt-4">
-          <span className="font-display text-lg font-extrabold text-ink">
-            {dish ? formatUsd(dish.priceCents) : "—"}
-          </span>
-
+        <div className="mt-auto flex items-end justify-between gap-2 pt-4">
           {!dish ? (
             <span className="text-xs font-semibold text-ink-muted">
               Indisponible
@@ -155,24 +170,40 @@ function DayCard({
             <button
               type="button"
               onClick={onOrder}
-              className="inline-flex items-center gap-1.5 rounded-btn bg-ink px-3.5 py-2 text-xs font-semibold text-cream transition-colors hover:bg-ink-soft"
+              className={`inline-flex items-center gap-1.5 rounded-btn px-3 py-2 text-xs font-semibold transition-colors ${
+                isToday
+                  ? "bg-ink text-cream hover:bg-ink-soft"
+                  : "border border-ink/15 text-ink hover:border-ink hover:bg-cream"
+              }`}
             >
               Commander
-              <svg
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
+              <span
+                className={isToday ? "text-amber" : "text-brand"}
                 aria-hidden="true"
-                className="text-amber"
               >
-                <path d="M5 12h14M13 6l6 6-6 6" />
-              </svg>
+                +
+              </span>
             </button>
+          )}
+
+          {dish && (
+            <p className="shrink-0 text-right leading-none">
+              {onSale && (
+                <s className="block text-[0.7rem] font-medium text-ink-muted">
+                  {formatUsd(dish.catalogPriceCents)}
+                </s>
+              )}
+              <span
+                className={`mt-1 block font-display text-lg font-extrabold ${
+                  onSale ? "text-brand-dark" : "text-ink"
+                }`}
+              >
+                {formatUsd(dish.priceCents)}
+              </span>
+              <span className="mt-1 block text-[0.62rem] text-ink-muted">
+                l&apos;assiette
+              </span>
+            </p>
           )}
         </div>
       </div>

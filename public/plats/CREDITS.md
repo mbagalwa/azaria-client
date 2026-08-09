@@ -6,6 +6,7 @@ sans attribution obligatoire, sans redevance.
 
 | Fichier | Source |
 |---|---|
+| `hero.jpg` | https://unsplash.com/photos/1604329760661-e71dc83f8f26 |
 | `plat-riz.jpg` | https://unsplash.com/photos/1512058564366-18510be2db19 |
 | `plat-poulet.jpg` | https://unsplash.com/photos/1555939594-58d7cb561ad1 |
 | `plat-legumes.jpg` | https://unsplash.com/photos/1546069901-ba9599a7e63c |

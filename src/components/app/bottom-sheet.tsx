@@ -45,7 +45,7 @@ export function BottomSheet({
       <div
         role="dialog"
         aria-modal="true"
-        className={`absolute inset-x-0 bottom-0 mx-auto flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-[1.75rem] border border-ink/10 bg-surface shadow-[0_-20px_60px_-30px_rgba(18,59,46,0.5)] transition-transform duration-300 ease-out ${
+        className={`absolute inset-x-0 bottom-0 mx-auto flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-panel border border-ink/10 bg-surface shadow-[0_-20px_60px_-30px_rgba(18,59,46,0.5)] transition-transform duration-300 ease-out ${
           open ? "translate-y-0" : "translate-y-full"
         }`}
       >
@@ -58,7 +58,7 @@ export function BottomSheet({
                 type="button"
                 onClick={onClose}
                 aria-label="Fermer"
-                className="-mr-1 rounded-full p-1.5 text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink"
+                className="-mr-1 rounded-btn p-1.5 text-ink-muted transition-colors hover:bg-ink/5 hover:text-ink"
               >
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
                   <path d="M18 6 6 18M6 6l12 12" />

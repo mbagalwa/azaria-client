@@ -1,10 +1,14 @@
 import { Logo } from "@/components/logo";
-import { navLinks, site } from "@/lib/site";
+import { site } from "@/lib/site";
 
+/**
+ * Pied de page sur le fond clair du site, séparé du contenu par un simple
+ * filet : coordonnées, réseaux et horaires.
+ */
 export function SiteFooter() {
   return (
     <footer className="mt-8 border-t border-ink/10">
-      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.4fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 md:grid-cols-[1.4fr_1fr]">
         <div>
           <span className="text-brand">
             <Logo />
@@ -20,24 +24,6 @@ export function SiteFooter() {
                   className="inline-flex rounded-chip border border-ink/15 px-4 py-1.5 text-xs font-medium text-ink-soft transition-colors hover:border-brand hover:text-brand"
                 >
                   {social.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <h2 className="font-display text-sm font-semibold text-ink">
-            Navigation
-          </h2>
-          <ul className="mt-4 space-y-2.5">
-            {navLinks.map((link) => (
-              <li key={link.href}>
-                <a
-                  href={link.href}
-                  className="text-sm text-ink-muted transition-colors hover:text-brand"
-                >
-                  {link.label}
                 </a>
               </li>
             ))}
