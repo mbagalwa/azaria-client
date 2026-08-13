@@ -90,9 +90,30 @@
     border-radius: 0.1em;
   }
 
+  /* Entrée du contenu au changement de slide du carrousel. On la
+     redéclenche côté React avec une `key` qui suit le jour actif. */
+  @keyframes fade-rise {
+    from {
+      opacity: 0;
+      transform: translateY(0.75rem);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .fade-rise {
+    animation: fade-rise 0.45s ease-out both;
+  }
+
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fade-rise {
+    animation: none;
+  }
+
   html {
     scroll-behavior: auto;
   }

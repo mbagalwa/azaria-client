@@ -1,217 +1,276 @@
 "use client";
 
-import { useState } from "react";
-import { OrderDialog } from "@/components/order-dialog";
-import { formatShortFR, weekdayShortFR } from "@/lib/dates";
-import { formatUsd } from "@/lib/format";
-import type { MenuDay } from "@/lib/orders";
+import Image, { type StaticImageData } from "next/image";
+import { useEffect, useState } from "react";
+
+import jeudiImg from "../../public/plats/menu/jeudi.jpg";
+import lundiImg from "../../public/plats/menu/lundi.jpg";
+import mardiImg from "../../public/plats/menu/mardi.jpg";
+import mercrediImg from "../../public/plats/menu/mercredi.jpg";
+import vendrediImg from "../../public/plats/menu/vendredi.jpg";
+import { WhatsappIcon, whatsappHref } from "@/components/whatsapp-button";
+import { PriceChip } from "@/components/price-tag";
+import { site } from "@/lib/site";
+
+type WeekDish = {
+  /** Jour de service, tel qu'affiché sur le volet. */
+  day: string;
+  /** Abrégé du jour, seule chose lisible sur un volet replié. */
+  short: string;
+  /** Date lisible du jour de service. */
+  date: string;
+  name: string;
+  sides: string;
+  /** Montant en francs congolais. */
+  priceFc: number;
+  image: StaticImageData;
+  alt: string;
+};
 
 /**
- * Les plats de la semaine, en grille de cartes d'après design/list.png :
- * photo carrée, repère de popularité, prix (barré quand la date est
- * programmée en promotion) et bouton compact. Un clic sur « Commander »
- * ouvre le formulaire — aucun compte n'est demandé.
- *
- * Deux écarts assumés avec le modèle : chaque carte est un JOUR et non un
- * produit (d'où la date en surtitre), et le badge de notation devient un
- * compteur de commandes réelles — il n'existe aucun système d'avis.
+ * ⚠️ Semaine en dur, le temps de valider le style. La forme correspond à
+ * ce que renverra l'API : un plat par jour de service.
  */
-export function WeekMenu({
-  days,
-  deliveryFeeCents,
-  today,
-  earliest,
-}: {
-  days: MenuDay[];
-  deliveryFeeCents: number;
-  /** Date du jour dans le fuseau métier (calculée par l'API). */
-  today: string;
-  /** 1re date commandable : avant elle, le cut-off est passé. */
-  earliest: string;
-}) {
-  const [openDate, setOpenDate] = useState<string | null>(null);
-  const active = days.find((d) => d.date === openDate && d.dish);
+const week: WeekDish[] = [
+  {
+    day: "Lundi",
+    short: "Lun",
+    date: "18 août",
+    name: "Poulet moambé",
+    sides: "Riz parfumé · Légumes de saison",
+    priceFc: 15000,
+    image: lundiImg,
+    alt: "Poulet braisé doré dans sa poêle en fonte",
+  },
+  {
+    day: "Mardi",
+    short: "Mar",
+    date: "19 août",
+    name: "Poulet sauce tomate",
+    sides: "Riz blanc · Bananes frites",
+    priceFc: 12000,
+    image: mardiImg,
+    alt: "Poulet mijoté à la sauce tomate, servi avec du riz",
+  },
+  {
+    day: "Mercredi",
+    short: "Mer",
+    date: "20 août",
+    name: "Bowl du marché",
+    sides: "Avocat · Patate douce · Pois chiches",
+    priceFc: 11000,
+    image: mercrediImg,
+    alt: "Bol de légumes frais, avocat et patate douce",
+  },
+  {
+    day: "Jeudi",
+    short: "Jeu",
+    date: "21 août",
+    name: "Poulet aux poivrons",
+    sides: "Chikwangue · Sauce tartare",
+    priceFc: 13500,
+    image: jeudiImg,
+    alt: "Sauté de poulet aux poivrons et basilic",
+  },
+  {
+    day: "Vendredi",
+    short: "Ven",
+    date: "22 août",
+    name: "Poisson grillé",
+    sides: "Semoule aux herbes · Crème d'avocat",
+    priceFc: 17000,
+    image: vendrediImg,
+    alt: "Pavé de poisson grillé, peau croustillante",
+  },
+];
+
+/** Durée d'affichage d'un volet avant de passer au suivant. */
+const ROTATE_MS = 5000;
+/** Rapport de largeur entre le volet ouvert et un volet replié. */
+const OPEN_GROW = 8;
+
+/** Même courbe partout : l'accordéon doit bouger d'un seul tenant. */
+const EASE = "duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]";
+
+export function WeekMenu() {
+  const [active, setActive] = useState(0);
+  const [paused, setPaused] = useState(false);
+
+  useEffect(() => {
+    if (paused) return;
+    // Pas de rotation automatique si l'utilisateur a demandé moins
+    // d'animations : il pilote alors l'accordéon aux volets.
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    const id = window.setInterval(
+      () => setActive((i) => (i + 1) % week.length),
+      ROTATE_MS,
+    );
+    return () => window.clearInterval(id);
+  }, [paused]);
+
+  function onKeyDown(event: React.KeyboardEvent) {
+    const step =
+      event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
+    if (step === 0) return;
+
+    event.preventDefault();
+    setActive((i) => (i + step + week.length) % week.length);
+  }
 
   return (
-    <>
-      <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {days.map((day) => (
-          <DayCard
-            key={day.date}
-            day={day}
-            isToday={day.date === today}
-            orderable={day.date >= earliest}
-            onOrder={() => setOpenDate(day.date)}
-          />
-        ))}
-      </div>
-
-      {active?.dish && (
-        <OrderDialog
-          date={active.date}
-          dish={active.dish}
-          deliveryFeeCents={deliveryFeeCents}
-          open
-          onClose={() => setOpenDate(null)}
-        />
-      )}
-    </>
-  );
-}
-
-function DayCard({
-  day,
-  isToday,
-  orderable,
-  onOrder,
-}: {
-  day: MenuDay;
-  isToday: boolean;
-  orderable: boolean;
-  onOrder: () => void;
-}) {
-  const dish = day.dish;
-  /** Promotion réelle : le prix du programme passe sous le prix catalogue. */
-  const onSale = dish ? dish.catalogPriceCents > dish.priceCents : false;
-
-  return (
-    <article
-      className={`group relative flex flex-col rounded-card border bg-surface p-3 transition-shadow hover:shadow-[0_20px_45px_-25px_rgba(18,59,46,0.5)] ${
-        isToday ? "border-ink ring-1 ring-ink" : "border-ink/10"
-      }`}
+    <section
+      id="menu"
+      aria-labelledby="menu-titre"
+      className="border-t border-cream-deep py-20 lg:py-28"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
-      <div className="relative aspect-square overflow-hidden rounded-chip bg-cream">
-        {dish?.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={dish.imageUrl}
-            alt={dish.name}
-            /* Section sous la ligne de flottaison : les 7 photos ne se
-               téléchargent qu'à l'approche du viewport. Le cadre ayant un
-               ratio fixe, rien ne se décale à leur arrivée. */
-            loading="lazy"
-            decoding="async"
-            className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-105 ${
-              orderable ? "" : "grayscale"
-            }`}
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-ink-muted/60">
-            <svg
-              width="34"
-              height="34"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M7 2v20M4 2v6a3 3 0 0 0 6 0V2M17 2c-1.5 2-2 4-2 6s.5 3 2 3 2-1 2-3-.5-4-2-6zM17 11v11" />
-            </svg>
-          </div>
-        )}
-
-        {/* Popularité réelle — remplace la notation du modèle */}
-        {dish && dish.orderCount > 0 && (
-          <span
-            className="absolute right-2 top-2 inline-flex items-center gap-1 rounded-chip bg-surface/95 px-2 py-1 text-[0.68rem] font-bold text-ink shadow-sm"
-            title={`Déjà commandé ${dish.orderCount} fois`}
+      <div className="mx-auto max-w-7xl px-6">
+        <header className="text-center">
+          <p className="font-signature text-3xl text-brand">La semaine</p>
+          <h2
+            id="menu-titre"
+            className="mt-1 font-display text-[clamp(2rem,5vw,3.5rem)] font-black uppercase leading-[0.9] tracking-tight text-ink"
           >
-            <svg
-              width="11"
-              height="11"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              aria-hidden="true"
-              className="text-brand"
-            >
-              <path d="M12 2.7s6 6.5 6 11.3a6 6 0 0 1-12 0C6 9.2 12 2.7 12 2.7z" />
-            </svg>
-            {dish.orderCount}
-            <span className="sr-only"> commandes déjà passées</span>
-          </span>
-        )}
+            Les plats de la semaine
+          </h2>
+        </header>
 
-        {/* Promotion : seulement si le prix programmé est réellement plus bas */}
-        {onSale && (
-          <span className="absolute left-2 top-2 rounded-chip bg-brand px-2 py-1 text-[0.62rem] font-bold uppercase tracking-wide text-white shadow-sm">
-            Promo
-          </span>
-        )}
+        {/* ---- Accordéon : le volet du jour s'ouvre, les autres se
+               replient en bandes. L'animation porte sur `flex-grow`,
+               ce qui garde la rangée pleine largeur en permanence. ---- */}
+        <ul
+          role="group"
+          aria-roledescription="carrousel"
+          aria-label="Plats de la semaine"
+          onKeyDown={onKeyDown}
+          className="mt-12 flex h-[22rem] gap-2 sm:h-[26rem] sm:gap-3 lg:h-[30rem]"
+        >
+          {week.map((dish, i) => {
+            const isOpen = i === active;
 
-        {!dish && (
-          <div className="absolute inset-0 flex items-center justify-center bg-ink/40">
-            <span className="rounded-chip bg-surface/95 px-3 py-1.5 text-xs font-bold uppercase tracking-wide text-ink">
-              Pas de service
-            </span>
-          </div>
-        )}
-      </div>
+            return (
+              <li
+                key={dish.day}
+                aria-roledescription="diapositive"
+                aria-label={`${i + 1} sur ${week.length} — ${dish.day}`}
+                onMouseEnter={() => setActive(i)}
+                style={{ flexGrow: isOpen ? OPEN_GROW : 1 }}
+                className={`group relative basis-0 overflow-hidden rounded-panel bg-ink transition-[flex-grow] ${EASE}`}
+              >
+                <Image
+                  src={dish.image}
+                  alt={dish.alt}
+                  placeholder="blur"
+                  fill
+                  sizes="(max-width: 640px) 70vw, 55rem"
+                  className={`object-cover object-center transition-all ${EASE} ${
+                    isOpen ? "scale-100" : "scale-110 saturate-[0.6]"
+                  }`}
+                />
 
-      <div className="flex flex-1 flex-col px-0.5 pt-3">
-        <p className="text-[0.62rem] font-bold uppercase tracking-[0.12em] text-ink-muted">
-          <span className={isToday ? "text-brand" : undefined}>
-            {isToday ? "Aujourd'hui" : weekdayShortFR(day.date)}
-          </span>
-          <span className="ml-1.5 font-semibold">{formatShortFR(day.date)}</span>
-        </p>
+                {/* Voile de lecture : dégradé sous le texte quand le volet
+                    est ouvert, aplat plus sombre quand il est replié. */}
+                <div
+                  className={`absolute inset-0 transition-opacity ${EASE} ${
+                    isOpen
+                      ? "bg-gradient-to-t from-ink/85 via-ink/25 to-transparent"
+                      : "bg-ink/45"
+                  }`}
+                />
 
-        <h3 className="mt-1 line-clamp-2 text-[0.9rem] font-semibold leading-snug text-ink">
-          {dish?.name ?? "Pas de service"}
-        </h3>
+                {/* --- Volet replié : le jour à la verticale --- */}
+                <div
+                  className={`absolute inset-0 flex flex-col items-center justify-end gap-3 pb-5 transition-opacity ${EASE} ${
+                    isOpen ? "pointer-events-none opacity-0" : "opacity-100"
+                  }`}
+                >
+                  <span className="font-display text-sm font-bold uppercase tracking-[0.2em] text-cream [writing-mode:vertical-rl] rotate-180">
+                    {dish.day}
+                  </span>
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-chip bg-cream/15 text-xs font-bold text-cream backdrop-blur-sm">
+                    {i + 1}
+                  </span>
+                </div>
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-4">
-          {!dish ? (
-            <span className="text-xs font-semibold text-ink-muted">
-              Indisponible
-            </span>
-          ) : !orderable ? (
-            <span className="text-xs font-semibold text-ink-muted">
-              Commandes closes
-            </span>
-          ) : (
+                {/* --- Volet ouvert : la fiche du plat --- */}
+                <div
+                  className={`absolute inset-x-0 bottom-0 p-5 transition-opacity ${EASE} sm:p-6 ${
+                    isOpen ? "opacity-100 delay-150" : "pointer-events-none opacity-0"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-chip bg-brand px-2.5 py-1 text-xs font-bold uppercase tracking-[0.14em] text-cream">
+                      {dish.short}
+                    </span>
+                    <span className="whitespace-nowrap text-xs font-semibold uppercase tracking-[0.14em] text-cream/70">
+                      {dish.date}
+                    </span>
+                  </div>
+
+                  {/* Le titre se replie plutôt que d'être rogné : un nom
+                      long dépasserait la largeur du volet, et le
+                      `overflow-hidden` le couperait sans prévenir. */}
+                  <h3 className="mt-3 text-balance font-display text-2xl font-black uppercase leading-[0.9] tracking-[-0.02em] text-cream sm:text-4xl">
+                    {dish.name}
+                  </h3>
+                  <p className="mt-2 truncate text-sm text-cream/75">
+                    {dish.sides}
+                  </p>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    <PriceChip amount={dish.priceFc} />
+                    <a
+                      href={whatsappHref(
+                        `Bonjour ${site.name}, je voudrais commander le plat de ${dish.day.toLowerCase()} ${dish.date} : ${dish.name}.`,
+                      )}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 whitespace-nowrap rounded-btn bg-brand px-4 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-brand-dark"
+                    >
+                      <WhatsappIcon className="size-4" />
+                      Commander
+                    </a>
+                  </div>
+                </div>
+
+                {/* Le volet replié est cliquable en entier, sans imbriquer
+                    de lien dans un bouton. */}
+                {!isOpen && (
+                  <button
+                    type="button"
+                    onClick={() => setActive(i)}
+                    className="absolute inset-0 z-10 cursor-pointer"
+                  >
+                    <span className="sr-only">
+                      Voir le plat de {dish.day.toLowerCase()}
+                    </span>
+                  </button>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* ---- Pastilles de progression ---- */}
+        <div className="mt-8 flex justify-center gap-2">
+          {week.map((dish, i) => (
             <button
+              key={dish.day}
               type="button"
-              onClick={onOrder}
-              className={`inline-flex items-center gap-1.5 rounded-btn px-3 py-2 text-xs font-semibold transition-colors ${
-                isToday
-                  ? "bg-ink text-cream hover:bg-ink-soft"
-                  : "border border-ink/15 text-ink hover:border-ink hover:bg-cream"
+              onClick={() => setActive(i)}
+              aria-label={`Voir le plat de ${dish.day.toLowerCase()}`}
+              aria-current={i === active}
+              className={`h-1.5 rounded-chip transition-all duration-500 ${
+                i === active ? "w-8 bg-brand" : "w-4 bg-cream-deep hover:bg-ink-muted"
               }`}
-            >
-              Commander
-              <span
-                className={isToday ? "text-amber" : "text-brand"}
-                aria-hidden="true"
-              >
-                +
-              </span>
-            </button>
-          )}
-
-          {dish && (
-            <p className="shrink-0 text-right leading-none">
-              {onSale && (
-                <s className="block text-[0.7rem] font-medium text-ink-muted">
-                  {formatUsd(dish.catalogPriceCents)}
-                </s>
-              )}
-              <span
-                className={`mt-1 block font-display text-lg font-extrabold ${
-                  onSale ? "text-brand-dark" : "text-ink"
-                }`}
-              >
-                {formatUsd(dish.priceCents)}
-              </span>
-              <span className="mt-1 block text-[0.62rem] text-ink-muted">
-                l&apos;assiette
-              </span>
-            </p>
-          )}
+            />
+          ))}
         </div>
       </div>
-    </article>
+    </section>
   );
 }

@@ -1,38 +1,25 @@
+import Link from "next/link";
+
 import { site } from "@/lib/site";
 
-type LogoProps = {
-  /** Taille du symbole en pixels. */
-  size?: number;
-  /** Masquer le mot « Azaria » et ne garder que le symbole. */
-  markOnly?: boolean;
-  className?: string;
-  /** Couleur du mot « Azaria » - à surcharger sur fond sombre. */
-  wordClassName?: string;
-};
-
 /**
- * Logo Azaria - le symbole est inliné (plutôt que chargé depuis
- * /logo.svg) pour éviter une requête supplémentaire et garder un rendu
- * net à toutes les tailles.
+ * Logo de la marque : la marque graphique (deux disques orange) suivie
+ * du nom. `compact` masque le nom, pour les contextes serrés (mobile).
  */
-export function Logo({
-  size = 34,
-  markOnly = false,
-  className,
-  wordClassName = "text-ink",
-}: LogoProps) {
+export function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-2.5 ${className ?? ""}`}>
+    <Link
+      href="/"
+      aria-label={`${site.name} — accueil`}
+      className="group inline-flex items-center gap-2.5"
+    >
       <svg
-        width={size}
-        height={size}
+        width="32"
+        height="32"
         viewBox="0 0 40 40"
         fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        role="img"
-        aria-label={markOnly ? site.name : undefined}
-        aria-hidden={markOnly ? undefined : true}
-        className="shrink-0"
+        aria-hidden
+        className="shrink-0 text-brand"
       >
         <path
           fillRule="evenodd"
@@ -45,14 +32,11 @@ export function Logo({
           fill="currentColor"
         />
       </svg>
-
-      {!markOnly && (
-        <span
-          className={`font-display text-[1.2rem] font-semibold tracking-tight ${wordClassName}`}
-        >
+      {!compact && (
+        <span className="font-display text-xl font-semibold tracking-tight text-ink">
           {site.name}
         </span>
       )}
-    </span>
+    </Link>
   );
 }
