@@ -1,65 +1,100 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
-import { Logo } from "@/components/logo";
-import { WhatsappButton } from "@/components/whatsapp-button";
+import { BagIcon, CloseIcon, MenuIcon } from "@/components/icons";
+import { useOrder } from "@/components/order-provider";
+import { Wordmark } from "@/components/wordmark";
 
-/** Défilement à partir duquel la barre se densifie et le CTA apparaît. */
-const REVEAL_AT = 80;
+const NAV = [
+  { label: "Plat du jour", href: "#plat-du-jour" },
+  { label: "Menu de la semaine", href: "#menu" },
+];
 
 /**
- * Barre de navigation minimale : le logo est centré tant qu'on est en
- * haut de page — le hero parle tout seul — puis il glisse à gauche et
- * laisse apparaître le bouton WhatsApp dès que la page défile.
+ * Barre sombre, du même vert que le hero : les deux ne forment qu'un
+ * seul bloc en haut de page. Navigation au centre sur grand écran ;
+ * panier et menu déroulant sur mobile, comme sur la maquette.
  */
 export function SiteHeader() {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > REVEAL_AT);
-    onScroll(); // état correct si la page est rechargée en cours de page
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const { openOrder, placedCount } = useOrder();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${
-        scrolled
-          ? "border-b border-cream-deep bg-white/80 backdrop-blur-md"
-          : "border-b border-transparent"
-      }`}
-    >
-      <div
-        className={`relative mx-auto flex max-w-7xl items-center px-6 transition-[height] duration-500 ease-out ${
-          scrolled ? "h-16" : "h-20"
-        }`}
-      >
-        {/* Positionné en absolu pour pouvoir glisser du centre vers la
-            gauche : `left` et `transform` s'animent tous les deux. */}
-        <div
-          className={`absolute top-1/2 transition-[left,transform] duration-500 ease-out ${
-            scrolled
-              ? "left-6 -translate-y-1/2"
-              : "left-1/2 -translate-x-1/2 -translate-y-1/2"
-          }`}
-        >
-          <Logo />
-        </div>
+    <header className="sticky top-0 z-50 bg-ink-deep">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between gap-6 px-5 sm:px-6">
+        <Wordmark />
 
-        {/* Réservé dans le flux en permanence : l'apparition se joue sur
-            l'opacité, pas sur le montage, pour ne rien décaler. */}
-        <div
-          className={`ml-auto transition-all duration-300 ${
-            scrolled
-              ? "translate-y-0 opacity-100"
-              : "pointer-events-none -translate-y-1 opacity-0"
-          }`}
-          aria-hidden={!scrolled}
-        >
-          <WhatsappButton />
+        <nav className="hidden md:block">
+          <ul className="flex items-center gap-9">
+            {NAV.map((item, i) => (
+              <li key={item.href}>
+                <a
+                  href={item.href}
+                  className={`relative block py-1 text-sm transition-colors hover:text-cream ${
+                    // Le premier lien porte le filet or de la maquette.
+                    i === 0
+                      ? "text-cream after:absolute after:inset-x-0 after:-bottom-1.5 after:h-px after:bg-gold"
+                      : "text-cream/70"
+                  }`}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Bouton complet à partir de `md`, icône seule en dessous. */}
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={() => openOrder()}
+            aria-label="Commander"
+            className="relative inline-flex items-center gap-2.5 rounded-btn text-sm text-gold transition-colors hover:text-cream md:border md:border-gold/60 md:px-5 md:py-2.5 md:hover:border-gold md:hover:text-gold"
+          >
+            <BagIcon className="size-6 md:size-4" />
+            <span className="hidden md:inline">Commander</span>
+            {placedCount > 0 && (
+              <span className="absolute -right-2 -top-2 flex size-4.5 items-center justify-center rounded-full bg-gold text-[0.6rem] font-bold text-ink-deep">
+                {placedCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-expanded={menuOpen}
+            aria-controls="menu-mobile"
+            aria-label={menuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            className="text-cream transition-colors hover:text-gold md:hidden"
+          >
+            {menuOpen ? <CloseIcon className="size-7" /> : <MenuIcon className="size-7" />}
+          </button>
         </div>
+      </div>
+
+      {/* Volet mobile : replié par défaut, il pousse le contenu plutôt que
+          de le recouvrir — la page reste lisible derrière. */}
+      <div
+        id="menu-mobile"
+        hidden={!menuOpen}
+        className="border-t border-ink-line md:hidden"
+      >
+        <ul className="mx-auto max-w-7xl px-5 py-3">
+          {NAV.map((item) => (
+            <li key={item.href}>
+              <a
+                href={item.href}
+                onClick={() => setMenuOpen(false)}
+                className="block py-3 text-sm text-cream/80 transition-colors hover:text-gold"
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
       </div>
     </header>
   );

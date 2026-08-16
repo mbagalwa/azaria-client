@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
-import { Caveat, Inter, Outfit } from "next/font/google";
+import { Inter, Lora } from "next/font/google";
 import "./globals.css";
 import { site } from "@/lib/site";
 
-/** Sans géométrique des titres, dans l'esprit du modèle du hero. */
-const outfit = Outfit({
-  variable: "--font-outfit",
-  subsets: ["latin"],
-  display: "swap",
-});
-
-/** Utilisée uniquement pour la signature manuscrite de la cheffe. */
-const caveat = Caveat({
-  variable: "--font-caveat",
+/**
+ * Serif éditoriale : Lora. Contraste modéré et empattements francs — le
+ * caractère de la maquette, en plus solide. Elle tient le titre du hero
+ * en très gros comme le prix d'une carte en 1 rem, ce que les Didones
+ * (Playfair) et les serifs à axe variable (Fraunces) rendaient fragile.
+ */
+const lora = Lora({
+  variable: "--font-lora",
   subsets: ["latin"],
   display: "swap",
 });
@@ -46,7 +44,7 @@ export default function RootLayout({
     <html
       lang="fr"
       data-scroll-behavior="smooth"
-      className={`${outfit.variable} ${inter.variable} ${caveat.variable} h-full antialiased`}
+      className={`${lora.variable} ${inter.variable} h-full antialiased`}
       /* Les extensions de navigateur (LanguageTool…) injectent des
          attributs sur <html> avant l'hydratation : on ignore ce faux
          positif, limité à cette balise. */
